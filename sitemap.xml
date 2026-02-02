@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://vindicta-platform.github.io/Agent-Auditor-SDK/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://vindicta-platform.github.io/Agent-Auditor-SDK/SETUP/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://vindicta-platform.github.io/Agent-Auditor-SDK/contributing/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://vindicta-platform.github.io/Agent-Auditor-SDK/getting-started/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://vindicta-platform.github.io/Agent-Auditor-SDK/inspection/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://vindicta-platform.github.io/Agent-Auditor-SDK/adr/000-template/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://vindicta-platform.github.io/Agent-Auditor-SDK/adr/001-python-language/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://vindicta-platform.github.io/Agent-Auditor-SDK/adr/002-precommit-required/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+</urlset>
