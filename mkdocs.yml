@@ -1,0 +1,25 @@
+site_name: Agent Auditor SDK
+site_description: Runtime monitoring and compliance for AI agents
+site_url: https://vindicta-platform.github.io/Agent-Auditor-SDK/
+
+repo_name: vindicta-platform/Agent-Auditor-SDK
+repo_url: https://github.com/vindicta-platform/Agent-Auditor-SDK
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: purple
+      accent: pink
+  font:
+    text: Outfit
+    code: JetBrains Mono
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Inspection: inspection.md
+  - Contributing: contributing.md
+
+plugins:
+  - search
