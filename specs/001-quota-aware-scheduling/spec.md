@@ -11,6 +11,22 @@ Brandon Fox has personal API access to Gemini Ultra via Google AI Studio. The Vi
 
 The core challenge: **How do we maximize utilization of expensive API quota while guaranteeing human requests are never blocked?**
 
+## Clarifications (Resolved 2026-02-01)
+
+| Question | Answer | Implication |
+|----------|--------|-------------|
+| **Gemini API Tier** | Tier 2+ | Baseline: 1000+ RPM, 2M TPM, 10K+ RPD - aggressive background utilization possible |
+| **Background Task Priority** | Rule-Sage Audit → Debate Simulation → Inference Batch | Validation accuracy prioritized over throughput |
+| **Human Reserve** | 50% | Conservative approach - half of quota always available for interactive use |
+| **Deployment Context** | Local only | Key stored in local `.env` file on Brandon's dev machine; no cloud/server deployment |
+| **Authentication Method** | ADC or API Key (spike resolved) | Both work: `gcloud auth application-default login` (SSO) or `GEMINI_API_KEY` env var |
+
+### Session 2026-02-01 (Authentication Spike)
+- **Q: Can I use my personal Google SSO instead of API key?** → **A: YES.** Two valid options:
+  1. **ADC (Application Default Credentials)**: Run `gcloud auth application-default login` once to cache your Google account OAuth tokens locally. The `google-generativeai` SDK auto-detects these.
+  2. **API Key**: Generate from Google AI Studio, set as `GEMINI_API_KEY` or `GOOGLE_API_KEY` env var.
+- **Recommendation**: Use ADC for personal SSO access (more secure, no key to manage). API key is fallback option.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Human Priority Guarantee (Priority: P1)
@@ -69,21 +85,23 @@ As **Brandon Fox**, I want to see real-time quota status and background task act
 
 ### Functional Requirements
 
-- **FR-001 (Priority Queue)**: The system MUST implement a dual-priority queue: **HUMAN** (P0, immediate) and **BACKGROUND** (P1-P5, deferrable). Human requests ALWAYS preempt background tasks.
+- **FR-001 (Priority Queue)**: The system MUST implement a dual-priority queue: **HUMAN** (P0, immediate) and **BACKGROUND** (P1-P3, deferrable). Human requests ALWAYS preempt background tasks.
 
-- **FR-002 (Quota Predictor)**: The system MUST implement a predictive model that estimates hourly quota surplus based on:
+- **FR-002 (Human Reserve)**: The system MUST reserve **50%** of available quota for human use at all times. Background tasks MUST NOT consume beyond the 50% ceiling.
+
+- **FR-003 (Quota Predictor)**: The system MUST implement a predictive model that estimates hourly quota surplus based on:
   - Current usage within the sliding window
   - Historical usage patterns (time-of-day, day-of-week)
-  - A configurable "human reserve" buffer (e.g., always keep 20% for humans)
+  - The fixed 50% human reserve buffer
 
 - **FR-003 (Gemini API Integration)**: The system MUST integrate with Google AI Studio / Gemini API using:
   - Personal API key authentication (environment variable: `GEMINI_API_KEY` or `AISTUDIO__API_KEY`)
   - Rate limit tracking (RPM, TPM, RPD dimensions)
   - Automatic retry with exponential backoff on 429 errors
 
-- **FR-004 (Task Scheduler)**: The system MUST schedule background AI tasks based on:
-  - Predicted surplus quota
-  - Task priority (user-defined or inferred)
+- **FR-005 (Task Scheduler)**: The system MUST schedule background AI tasks based on:
+  - Predicted surplus quota (within 50% background ceiling)
+  - Task priority: Rule Sage (P1) > Debate Simulation (P2) > Inference Batch (P3)
   - Task cost estimation (tokens/requests)
 
 - **FR-005 (Graceful Degradation)**: When quota is exhausted:
@@ -98,18 +116,18 @@ As **Brandon Fox**, I want to see real-time quota status and background task act
   - Token/request cost
   - Success/failure status
 
-- **FR-007 (Configuration)**: The system MUST support configuration via environment variables and/or config file:
-  - `QUOTA_HUMAN_RESERVE_PERCENT`: Default 20%
+- **FR-008 (Configuration)**: The system MUST support configuration via environment variables:
+  - `QUOTA_HUMAN_RESERVE_PERCENT`: Default **50%**
   - `QUOTA_PREDICTION_LOOKBACK_DAYS`: Default 7
-  - `QUOTA_RPM_LIMIT`: Override for testing (default: from API tier)
-  - `QUOTA_TPM_LIMIT`: Override for testing
-  - `QUOTA_RPD_LIMIT`: Override for testing
+  - `QUOTA_RPM_LIMIT`: Default **1000** (Tier 2+)
+  - `QUOTA_TPM_LIMIT`: Default **2000000** (Tier 2+)
+  - `QUOTA_RPD_LIMIT`: Default **10000** (Tier 2+)
 
 ### Key Entities
 
 - **QuotaPredictor**: Engine that forecasts hourly surplus based on usage history and current state. Outputs a "safe budget" for background tasks.
 
-- **TaskQueue**: Priority-ordered queue holding pending background AI tasks. Supports enqueue, dequeue, pause, and resume operations.
+- **TaskQueue**: Priority-ordered queue holding pending background AI tasks. Priority order: **P1 (Rule Sage) > P2 (Debate) > P3 (Inference)**. Supports enqueue, dequeue, pause, and resume.
 
 - **ArbiterScheduler**: Coordinator that:
   1. Checks current quota state
@@ -121,7 +139,7 @@ As **Brandon Fox**, I want to see real-time quota status and background task act
 
 ### Assumptions
 
-- **Gemini API Tier**: Assumes Paid Tier 1 limits as baseline (150-300 RPM, 1M TPM, 1000 RPD). System should gracefully handle lower limits (Free Tier).
+- **Gemini API Tier**: **Tier 2+** limits as baseline (1000+ RPM, 2M TPM, 10000+ RPD).
 - **Single User**: This system is designed for Brandon Fox's personal API key, not multi-tenant.
 - **Hourly Granularity**: Prediction and budgeting operate at hourly intervals as a reasonable tradeoff between responsiveness and stability.
 - **Local Persistence**: Usage history stored locally (SQLite/JSON), not cloud-synced.
@@ -156,16 +174,9 @@ As **Brandon Fox**, I want to see real-time quota status and background task act
 - Gemini API access via personal API key
 - Meta-Oracle pipeline for background task generation
 
+
 ## Open Questions
 
-[NEEDS CLARIFICATION: Gemini Tier] What is your current Google AI Studio tier? (Free, Tier 1, Tier 2, or Enterprise) This affects the baseline limits we should target.
+I am not clear how `Context: FR-003 specifies using GEMINI_API_KEY or AISTUDIO__API_KEY environment variables` will use my personal API key?
 
-[NEEDS CLARIFICATION: Background Task Types] What specific background AI tasks should be prioritized? Options:
-| Priority | Task Type | Description |
-|----------|-----------|-------------|
-| P1 | Rule Sage Audit | Verify rule citations are valid |
-| P2 | Debate Simulation | Generate debates for training |
-| P3 | Inference Batch | Run prediction batches |
-| Custom | User-defined | Other task types? |
 
-[NEEDS CLARIFICATION: Human Reserve] What percentage of quota should ALWAYS be reserved for human use? (Suggested: 20-30%)
