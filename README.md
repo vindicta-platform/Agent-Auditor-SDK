@@ -16,8 +16,18 @@ The Agent-Auditor-SDK provides the foundational framework for creating agents th
 
 ## Installation
 
+Install from source using uv:
+
 ```bash
-pip install agent-auditor-sdk
+uv pip install git+https://github.com/vindicta-platform/Agent-Auditor-SDK.git
+```
+
+Or clone and install locally:
+
+```bash
+git clone https://github.com/vindicta-platform/Agent-Auditor-SDK.git
+cd Agent-Auditor-SDK
+uv pip install -e .
 ```
 
 ## Quick Start
