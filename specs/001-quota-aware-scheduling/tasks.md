@@ -59,14 +59,14 @@
 ## Phase 4: User Story 2 — Predictive Quota Budgeting (P1)
 
 ### Usage Journal
-- [ ] T200 [US2] Write failing tests for `UsageJournal.record_usage()` in `tests/test_quota.py`
-- [ ] T201 [US2] Write failing tests for `UsageJournal.get_history()`
-- [ ] T202 [US2] Implement `UsageJournal` in `quota.py`
+- [x] T200 [US2] Write failing tests for `UsageJournal.record_usage()` in `tests/test_quota.py`
+- [x] T201 [US2] Write failing tests for `UsageJournal.get_history()`
+- [x] T202 [US2] Implement `UsageJournal` in `quota.py`
 
 ### Quota Predictor
-- [ ] T210 [US2] Write failing tests for `QuotaPredictor.get_safe_budget()`
-- [ ] T211 [US2] Write failing tests for time-of-day pattern awareness
-- [ ] T212 [US2] Implement `QuotaPredictor` in `quota.py`
+- [x] T210 [US2] Write failing tests for `QuotaPredictor.get_safe_budget()`
+- [x] T211 [US2] Write failing tests for time-of-day pattern awareness
+- [x] T212 [US2] Implement `QuotaPredictor` in `quota.py`
 
 ### Checkpoint US2
 - [ ] T299 [US2] Run acceptance tests for User Story 2, verify all pass
