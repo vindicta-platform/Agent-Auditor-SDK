@@ -76,18 +76,18 @@
 ## Phase 5: User Story 3 — Background Task Execution (P2)
 
 ### Dead-Letter Queue
-- [ ] T300 [US3] Write failing tests for `DeadLetterQueue` in `tests/test_queue.py`
-- [ ] T301 [US3] Implement `DeadLetterQueue` in `queue.py`
+- [x] T300 [US3] Write failing tests for `DeadLetterQueue` in `tests/test_queue.py`
+- [x] T301 [US3] Implement `DeadLetterQueue` in `queue.py`
 
 ### Task Worker
-- [/] T310 [US3] Write failing tests for `TaskWorker.process()` in `tests/test_worker.py`
-- [/] T311 [US3] Write failing tests for retry with backoff
-- [/] T312 [US3] Write failing tests for dead-letter on failure
-- [ ] T313 [US3] Implement `worker.py` to pass tests
+- [x] T310 [US3] Write failing tests for `TaskWorker.process()` in `tests/test_worker.py`
+- [x] T311 [US3] Write failing tests for retry with backoff
+- [x] T312 [US3] Write failing tests for dead-letter on failure
+- [x] T313 [US3] Implement `worker.py` to pass tests
 
 ### Batch Processing
-- [ ] T320 [US3] Write failing tests for `scheduler.process_batch()`
-- [ ] T321 [US3] Implement batch processing in `scheduler.py`
+- [x] T320 [US3] Write failing tests for `scheduler.process_batch()`
+- [x] T321 [US3] Implement batch processing in `scheduler.py`
 
 ### Checkpoint US3
 - [ ] T399 [US3] Run acceptance tests for User Story 3, verify all pass
@@ -97,23 +97,23 @@
 ## Phase 6: User Story 4 — Quota Visibility Dashboard (P3)
 
 ### Python API
-- [ ] T400 [US4] Write failing tests for `scheduler.get_status()` in `tests/test_scheduler.py`
-- [ ] T401 [US4] Implement `get_status()` in `scheduler.py`
+- [x] T400 [US4] Write failing tests for `scheduler.get_status()` in `tests/test_scheduler.py`
+- [x] T401 [US4] Implement `get_status()` in `scheduler.py`
 
 ### CLI
-- [ ] T410 [US4] Write failing tests for CLI in `tests/test_cli.py`
-- [ ] T411 [US4] Implement `__main__.py` for CLI
+- [x] T410 [US4] Write failing tests for CLI in `tests/test_cli.py`
+- [x] T411 [US4] Implement `__main__.py` for CLI
 
 ### Checkpoint US4
-- [ ] T499 [US4] Run acceptance tests for User Story 4, verify all pass
+- [x] T499 [US4] Run acceptance tests for User Story 4, verify all pass
 
 ---
 
 ## Phase 7: Polish
 
-- [ ] T900 Run full test suite, verify 100% pass
-- [ ] T901 Run mypy --strict, fix any type errors
-- [ ] T902 Run ruff check, fix any lint errors
+- [/] T900 Run full test suite, verify 100% pass
+- [/] T901 Run mypy --strict, fix any type errors
+- [/] T902 Run ruff check, fix any lint errors
 - [ ] T903 Update README with usage examples
 - [ ] T904 Commit and tag v0.1.0
 
