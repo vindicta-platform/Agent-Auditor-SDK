@@ -111,11 +111,11 @@
 
 ## Phase 7: Polish
 
-- [/] T900 Run full test suite, verify 100% pass
-- [/] T901 Run mypy --strict, fix any type errors
-- [/] T902 Run ruff check, fix any lint errors
-- [ ] T903 Update README with usage examples
-- [ ] T904 Commit and tag v0.1.0
+- [x] T900 Run full test suite, verify 100% pass
+- [x] T901 Run mypy --strict, fix any type errors
+- [x] T902 Run ruff check, fix any lint errors
+- [x] T903 Update README with usage examples
+- [x] T904 Commit and tag v0.1.0
 
 ---
 
