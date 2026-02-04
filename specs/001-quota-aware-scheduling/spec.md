@@ -156,16 +156,63 @@ As **Brandon Fox**, I want to see real-time quota status and background task act
 - Gemini API access via personal API key
 - Meta-Oracle pipeline for background task generation
 
-## Open Questions
+## Clarifications (Resolved)
 
-[NEEDS CLARIFICATION: Gemini Tier] What is your current Google AI Studio tier? (Free, Tier 1, Tier 2, or Enterprise) This affects the baseline limits we should target.
+### Gemini Tier ✅
+**Answer**: Free Tier (corrected)
+- 15 RPM (requests per minute)
+- 1M TPM (tokens per minute)  
+- 1,500 RPD (requests per day)
 
-[NEEDS CLARIFICATION: Background Task Types] What specific background AI tasks should be prioritized? Options:
+### Background Task Priority Order ✅
+**Answer**: Confirmed as specified
+
 | Priority | Task Type | Description |
 |----------|-----------|-------------|
-| P1 | Rule Sage Audit | Verify rule citations are valid |
+| P1 | Rule-Sage Audit | Verify rule citations are valid |
 | P2 | Debate Simulation | Generate debates for training |
 | P3 | Inference Batch | Run prediction batches |
-| Custom | User-defined | Other task types? |
+| P4 | Training Runs | ML model training |
+| P5 | Analytics | Background analytics |
 
-[NEEDS CLARIFICATION: Human Reserve] What percentage of quota should ALWAYS be reserved for human use? (Suggested: 20-30%)
+### Human Reserve Percentage ✅
+**Answer**: 30% (conservative)
+- Always reserve 30% of quota for human requests
+- Background tasks may use up to 70% of available quota
+
+### API Adapter ✅
+**Answer**: google-generativeai SDK
+- Use Google's official Python SDK
+- Handles auth, retries, and model selection
+
+### Persistence Layer ✅
+**Answer**: SQLite (recommended)
+- Standard library support (sqlite3)
+- Single-file, survives restarts
+- Adequate for usage journal and queue
+
+### Concurrency Model ✅
+**Answer**: Producer-Consumer (recommended)
+- Scheduler (producer): Decides WHEN tasks run based on quota
+- Worker (consumer): Executes tasks against API
+- Better separation of concerns (SOLID)
+- Easier to test in isolation
+
+### Quota Exhaustion Behavior ✅
+**Answer**: Persist & Resume
+- On RPD exhaustion, persist pending tasks to SQLite
+- Resume automatically after 24h quota reset
+- No work is lost
+
+### API Error Handling ✅
+**Answer**: Dead-Letter Queue
+- Retry 3x with exponential backoff
+- If still failing, move to dead-letter queue
+- Dead-letter tasks can be reviewed and retried manually
+
+### Dashboard Delivery ✅
+**Answer**: All of the above (incremental)
+- **v0.1**: Python function `scheduler.get_status()` → dict
+- **v0.2**: CLI command `python -m agent_auditor status`
+- **v1.0**: HTTP endpoint via FastAPI for JSON status
+
