@@ -15,6 +15,7 @@ from typing import Optional, Tuple
 from agent_auditor.errors import APIKeyNotFoundError, RateLimitError
 from agent_auditor.models import AITask
 from agent_auditor.security import SecureKeyManager
+from agent_auditor.settings import GeminiSettings, get_settings
 
 
 class GeminiAdapter:
@@ -31,13 +32,12 @@ class GeminiAdapter:
         response, tokens = await adapter.call(task)
     """
     
-    DEFAULT_MODEL = "gemini-1.5-flash"
-    
     def __init__(
         self, 
         api_key: Optional[str] = None,
-        max_retries: int = 5,
-        base_retry_delay: float = 1.0
+        max_retries: Optional[int] = None,
+        base_retry_delay: Optional[float] = None,
+        settings: Optional[GeminiSettings] = None
     ) -> None:
         """
         Initialize the Gemini adapter.
@@ -46,12 +46,17 @@ class GeminiAdapter:
             api_key: Optional explicit API key. If not provided, reads from env.
             max_retries: Maximum retry attempts on 429 errors.
             base_retry_delay: Base delay for exponential backoff (seconds).
+            settings: Optional GeminiSettings, otherwise uses global settings.
             
         Raises:
             APIKeyNotFoundError: If no API key is available.
         """
-        self.max_retries = max_retries
-        self.base_retry_delay = base_retry_delay
+        # Use provided settings or load from environment
+        self._settings = settings or get_settings().gemini
+        
+        self.max_retries = max_retries if max_retries is not None else self._settings.max_retries
+        self.base_retry_delay = base_retry_delay if base_retry_delay is not None else self._settings.base_retry_delay
+        self.default_model = self._settings.default_model
         
         # Handle explicit key or read from environment
         if api_key:
@@ -68,7 +73,14 @@ class GeminiAdapter:
                 "or pass api_key parameter."
             )
         
-        # Initialize the SDK (lazy import to allow mocking)
+        # Validate SDK is available (fail-fast)
+        try:
+            import google.generativeai as genai
+            self._genai = genai
+        except ImportError:
+            self._genai = None  # Will use placeholder in tests
+        
+        # Client will be configured on first use
         self._client = None
     
     async def call(self, task: AITask) -> Tuple[str, int]:
@@ -113,18 +125,16 @@ class GeminiAdapter:
         Returns:
             Tuple of (response_text, tokens_used).
         """
-        # Lazy initialize SDK
+        # Initialize SDK if available
         if self._client is None:
-            try:
-                import google.generativeai as genai
-                genai.configure(api_key=self._key_manager.get_key())
-                self._client = genai
-            except ImportError:
+            if self._genai is None:
                 # SDK not installed, return placeholder for testing
                 return ("SDK not installed", 0)
+            self._genai.configure(api_key=self._key_manager.get_key())
+            self._client = self._genai
         
         # Get the model
-        model = self._client.GenerativeModel(task.model or self.DEFAULT_MODEL)
+        model = self._client.GenerativeModel(task.model or self.default_model)
         
         # Make the async call
         loop = asyncio.get_event_loop()
@@ -154,7 +164,7 @@ class GeminiAdapter:
     
     def __str__(self) -> str:
         """Return safe string representation."""
-        return f"GeminiAdapter(model={self.DEFAULT_MODEL}, key={self._key_manager.get_masked_key()})"
+        return f"GeminiAdapter(model={self.default_model}, key={self._key_manager.get_masked_key()})"
     
     def __repr__(self) -> str:
         """Return safe repr."""

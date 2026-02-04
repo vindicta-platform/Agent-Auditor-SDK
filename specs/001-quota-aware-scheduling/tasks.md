@@ -47,9 +47,9 @@
 - [x] T112 [US1] Implement `scheduler.py` with human priority logic
 
 ### Gemini Adapter
-- [/] T120 [US1] Write failing tests for `GeminiAdapter.call()` in `tests/test_gemini.py`
-- [/] T121 [US1] Implement `adapters/gemini.py` to pass tests for rate limit handling (429)
-- [ ] T122 [US1] Implement `adapters/gemini.py` to pass tests
+- [x] T120 [US1] Write failing tests for `GeminiAdapter.call()` in `tests/test_gemini.py`
+- [x] T121 [US1] Implement `adapters/gemini.py` to pass tests for rate limit handling (429)
+- [x] T122 [US1] Implement `adapters/gemini.py` to pass tests
 
 ### Checkpoint US1
 - [ ] T199 [US1] Run acceptance tests for User Story 1, verify all pass
