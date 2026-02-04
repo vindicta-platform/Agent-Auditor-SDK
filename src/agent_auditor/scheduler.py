@@ -14,6 +14,7 @@ from uuid import UUID
 from agent_auditor.errors import QuotaExhaustedError
 from agent_auditor.models import AITask, RequestPriority, TaskResult, TierLimits
 from agent_auditor.queue import TaskQueue
+from agent_auditor.settings import SchedulerSettings, get_settings
 
 if TYPE_CHECKING:
     from agent_auditor.persistence.sqlite import SQLiteStorage
@@ -34,13 +35,11 @@ class ArbiterScheduler:
         result = await scheduler.submit(task)
     """
     
-    # Priority threshold: HUMAN and CRITICAL execute immediately
-    IMMEDIATE_PRIORITY_THRESHOLD = RequestPriority.HIGH
-    
     def __init__(
         self, 
         tier_limits: Optional[TierLimits] = None,
-        storage: Optional["SQLiteStorage"] = None
+        storage: Optional["SQLiteStorage"] = None,
+        settings: Optional[SchedulerSettings] = None
     ) -> None:
         """
         Initialize the scheduler.
@@ -48,7 +47,11 @@ class ArbiterScheduler:
         Args:
             tier_limits: API limits (defaults to Free Tier).
             storage: Optional SQLite storage for persistence.
+            settings: Optional SchedulerSettings, otherwise uses global settings.
         """
+        # Use provided settings or load from environment
+        self._settings = settings or get_settings().scheduler
+        
         self.tier_limits = tier_limits or TierLimits()
         self.queue = TaskQueue(storage=storage)
         
@@ -111,7 +114,10 @@ class ArbiterScheduler:
         Returns:
             "immediate" for high priority, "queue" for background.
         """
-        if task.priority <= self.IMMEDIATE_PRIORITY_THRESHOLD:
+        # Use settings threshold (default: HIGH priority and above are immediate)
+        # Handle both IntEnum and int (Pydantic may coerce to int)
+        priority_value = task.priority.value if hasattr(task.priority, 'value') else task.priority
+        if priority_value <= self._settings.immediate_priority_threshold:
             return "immediate"
         return "queue"
     

@@ -44,6 +44,10 @@ class SchedulerSettings(BaseSettings):
     # Background processing
     batch_size: int = 10
     poll_interval_seconds: float = 5.0
+    
+    # Priority threshold (0=HUMAN, 1=CRITICAL, 2=HIGH, 3=NORMAL, 4=LOW, 5=BACKGROUND)
+    # Tasks at or below this priority execute immediately
+    immediate_priority_threshold: int = 2  # HIGH
 
 
 class Settings(BaseSettings):

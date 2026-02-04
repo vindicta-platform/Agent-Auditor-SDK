@@ -80,9 +80,9 @@
 - [ ] T301 [US3] Implement `DeadLetterQueue` in `queue.py`
 
 ### Task Worker
-- [ ] T310 [US3] Write failing tests for `TaskWorker.process()` in `tests/test_worker.py`
-- [ ] T311 [US3] Write failing tests for retry with backoff
-- [ ] T312 [US3] Write failing tests for dead-letter on failure
+- [/] T310 [US3] Write failing tests for `TaskWorker.process()` in `tests/test_worker.py`
+- [/] T311 [US3] Write failing tests for retry with backoff
+- [/] T312 [US3] Write failing tests for dead-letter on failure
 - [ ] T313 [US3] Implement `worker.py` to pass tests
 
 ### Batch Processing
