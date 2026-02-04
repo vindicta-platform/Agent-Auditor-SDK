@@ -36,14 +36,14 @@
 ## Phase 3: User Story 1 — Human Priority Guarantee (P1)
 
 ### Queue
-- [/] T100 [US1] Write failing tests for `TaskQueue.enqueue()` in `tests/test_queue.py`
-- [/] T101 [US1] Write failing tests for `TaskQueue.dequeue()` priority ordering
-- [/] T102 [US1] Write failing tests for `TaskQueue.peek()`
-- [ ] T103 [US1] Implement `queue.py` to pass tests
+- [x] T100 [US1] Write failing tests for `TaskQueue.enqueue()` in `tests/test_queue.py`
+- [x] T101 [US1] Write failing tests for `TaskQueue.dequeue()` priority ordering
+- [x] T102 [US1] Write failing tests for `TaskQueue.peek()`
+- [x] T103 [US1] Implement `queue.py` to pass tests
 
 ### Scheduler (Human Priority)
-- [ ] T110 [US1] Write failing tests for `ArbiterScheduler.submit()` with HUMAN priority
-- [ ] T111 [US1] Write failing tests for preemption (human pauses background)
+- [/] T110 [US1] Write failing tests for `ArbiterScheduler.submit()` with HUMAN priority
+- [/] T111 [US1] Write failing tests for preemption (human pauses background)
 - [ ] T112 [US1] Implement `scheduler.py` with human priority logic
 
 ### Gemini Adapter
