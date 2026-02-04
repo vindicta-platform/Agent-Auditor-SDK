@@ -42,13 +42,13 @@
 - [x] T103 [US1] Implement `queue.py` to pass tests
 
 ### Scheduler (Human Priority)
-- [/] T110 [US1] Write failing tests for `ArbiterScheduler.submit()` with HUMAN priority
-- [/] T111 [US1] Write failing tests for preemption (human pauses background)
-- [ ] T112 [US1] Implement `scheduler.py` with human priority logic
+- [x] T110 [US1] Write failing tests for `ArbiterScheduler.submit()` with HUMAN priority
+- [x] T111 [US1] Write failing tests for preemption (human pauses background)
+- [x] T112 [US1] Implement `scheduler.py` with human priority logic
 
 ### Gemini Adapter
-- [ ] T120 [US1] Write failing tests for `GeminiAdapter.generate()` in `tests/test_adapters.py`
-- [ ] T121 [US1] Write failing tests for rate limit handling (429)
+- [/] T120 [US1] Write failing tests for `GeminiAdapter.call()` in `tests/test_gemini.py`
+- [/] T121 [US1] Implement `adapters/gemini.py` to pass tests for rate limit handling (429)
 - [ ] T122 [US1] Implement `adapters/gemini.py` to pass tests
 
 ### Checkpoint US1
