@@ -6,6 +6,7 @@ Implements:
 - Rate limit handling with exponential backoff
 - Secure API key handling (via SecureKeyManager)
 - Token usage tracking
+- Proactive RPM/TPM rate limiting
 """
 
 import asyncio
@@ -14,6 +15,7 @@ from typing import Optional, Tuple
 
 from agent_auditor.errors import APIKeyNotFoundError, RateLimitError
 from agent_auditor.models import AITask
+from agent_auditor.rate_limiter import RateLimiter, get_rate_limiter
 from agent_auditor.security import SecureKeyManager
 from agent_auditor.settings import GeminiSettings, get_settings
 
@@ -37,7 +39,8 @@ class GeminiAdapter:
         api_key: Optional[str] = None,
         max_retries: Optional[int] = None,
         base_retry_delay: Optional[float] = None,
-        settings: Optional[GeminiSettings] = None
+        settings: Optional[GeminiSettings] = None,
+        rate_limiter: Optional[RateLimiter] = None
     ) -> None:
         """
         Initialize the Gemini adapter.
@@ -47,6 +50,7 @@ class GeminiAdapter:
             max_retries: Maximum retry attempts on 429 errors.
             base_retry_delay: Base delay for exponential backoff (seconds).
             settings: Optional GeminiSettings, otherwise uses global settings.
+            rate_limiter: Optional RateLimiter for RPM/TPM enforcement.
             
         Raises:
             APIKeyNotFoundError: If no API key is available.
@@ -57,6 +61,9 @@ class GeminiAdapter:
         self.max_retries = max_retries if max_retries is not None else self._settings.max_retries
         self.base_retry_delay = base_retry_delay if base_retry_delay is not None else self._settings.base_retry_delay
         self.default_model = self._settings.default_model
+        
+        # Rate limiter for RPM/TPM enforcement
+        self._rate_limiter = rate_limiter or get_rate_limiter()
         
         # Handle explicit key or read from environment
         if api_key:
@@ -83,12 +90,13 @@ class GeminiAdapter:
         # Client will be configured on first use
         self._client = None
     
-    async def call(self, task: AITask) -> Tuple[str, int]:
+    async def call(self, task: AITask, estimated_tokens: int = 500) -> Tuple[str, int]:
         """
-        Execute an AI task.
+        Execute an AI task with rate limiting.
         
         Args:
             task: The AITask to execute.
+            estimated_tokens: Estimated tokens for rate limiting (default 500).
             
         Returns:
             Tuple of (response_text, tokens_used).
@@ -96,12 +104,18 @@ class GeminiAdapter:
         Raises:
             RateLimitError: If max retries exceeded.
         """
+        # Acquire rate limit before proceeding
+        await self._rate_limiter.acquire(estimated_tokens)
+        
         retries = 0
         last_error = None
         
         while retries <= self.max_retries:
             try:
-                return await self._generate(task)
+                response, tokens_used = await self._generate(task)
+                # Record actual usage for rate limiter
+                self._rate_limiter.record_usage(tokens_used, estimated_tokens)
+                return response, tokens_used
             except RateLimitError as e:
                 last_error = e
                 retries += 1
