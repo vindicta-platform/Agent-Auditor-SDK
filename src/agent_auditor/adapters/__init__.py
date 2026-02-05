@@ -1,5 +1,5 @@
 """Adapters subpackage for Agent-Auditor-SDK."""
 
-from agent_auditor.adapters.gemini import GeminiAdapter
+from agent_auditor.adapters.gemini import GeminiAdapter, RateLimiter
 
-__all__ = ["GeminiAdapter"]
+__all__ = ["GeminiAdapter", "RateLimiter"]

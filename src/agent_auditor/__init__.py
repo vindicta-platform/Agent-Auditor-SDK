@@ -27,6 +27,12 @@ from agent_auditor.models import (
 )
 
 __version__ = "0.1.0"
+from agent_auditor.scheduler import ArbiterScheduler
+from agent_auditor.queue import TaskQueue
+from agent_auditor.quota import QuotaPredictor
+from agent_auditor.security import SecureKeyManager
+
+__version__ = "0.1.0"
 __all__ = [
     "RequestPriority",
     "AITask",
@@ -34,10 +40,8 @@ __all__ = [
     "QuotaBudget",
     "TierLimits",
     "UsageEntry",
+    "ArbiterScheduler",
+    "TaskQueue",
+    "QuotaPredictor",
+    "SecureKeyManager",
 ]
-
-# These will be imported once implemented:
-# from agent_auditor.scheduler import ArbiterScheduler
-# from agent_auditor.queue import TaskQueue
-# from agent_auditor.quota import QuotaPredictor
-# from agent_auditor.security import SecureKeyManager

@@ -159,3 +159,10 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Behave
+behave_output.txt
+
+# Agent-Auditor-SDK
+Agent-Auditor-SDK.code-workspace
+.agent-auditor-sdk
