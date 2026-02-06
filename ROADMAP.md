@@ -2,7 +2,7 @@
 
 > **Vision**: Quota-aware AI scheduling that never blocks humans  
 > **Status**: Active Development  
-> **Last Updated**: 2026-02-04
+> **Last Updated**: 2026-02-05
 
 ---
 
@@ -205,7 +205,7 @@ Deliver a production-ready SDK that manages AI API quota across all Vindicta pro
 |-------------|------------|
 | **Rate Limits** | Respects all RPM/TPM/RPD limits from API tier |
 | **No Aggressive Retry** | Backoff on 429, no retry spam |
-| **Single User** | Key used by single owner (Brandon Fox) |
+| **Single User** | Key used by owner (Brandon Fox) |
 | **No Sharing** | Key never transmitted to external services |
 | **Minimal Footprint** | Background tasks yield to API tier constraints |
 | **Purpose Aligned** | Usage for Vindicta platform development only |
