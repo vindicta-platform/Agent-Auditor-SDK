@@ -7,7 +7,7 @@ All models use Pydantic for validation and serialization.
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import IntEnum
-from typing import Any, Literal
+from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -44,11 +44,11 @@ class AITask(BaseModel):
         default=RequestPriority.NORMAL, 
         description="Task priority level"
     )
-    estimated_tokens: int = Field(
-        default=1000, 
-        ge=1,
-        description="Estimated token consumption"
+    estimated_tokens: Optional[int] = Field(
+        default=None, 
+        description="Estimated token count for proactive rate limiting"
     )
+    history: List[Dict[str, str]] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     metadata: dict[str, Any] = Field(default_factory=dict)
     
