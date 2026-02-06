@@ -9,7 +9,7 @@ import pytest
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-from agent_auditor.quota import UsageJournal, QuotaPredictor
+from agent_auditor.quota import UsageJournal, QuotaPredictor, HistoricalPatternAnalyzer, TimeAwareQuotaPredictor
 from agent_auditor.models import UsageEntry, RequestPriority, TierLimits
 
 
@@ -246,3 +246,122 @@ class TestQuotaPredictor:
         
         # Assert
         assert 0.0 <= budget.confidence <= 1.0
+
+
+class TestHistoricalPatternAnalyzer:
+    """Tests for Issue #6: Historical pattern analysis."""
+
+    @pytest.mark.asyncio
+    async def test_get_hourly_distribution_returns_24_hours(self):
+        # Arrange
+        journal = UsageJournal()
+        analyzer = HistoricalPatternAnalyzer(journal)
+        
+        # Act
+        distribution = await analyzer.get_hourly_distribution()
+        
+        # Assert
+        assert len(distribution) == 24
+        for hour in range(24):
+            assert hour in distribution
+
+    @pytest.mark.asyncio
+    async def test_get_peak_hours_returns_sorted_list(self):
+        # Arrange
+        journal = UsageJournal()
+        now = datetime.utcnow()
+        
+        # Add more usage at hour 14
+        for i in range(10):
+            entry = UsageEntry(
+                timestamp=now.replace(hour=14, minute=i),
+                task_id=f"peak-{i}",
+                request_type="background",
+                priority=RequestPriority.NORMAL,
+                tokens_used=100,
+                requests_used=10,  # High usage
+                success=True,
+                latency_ms=100
+            )
+            await journal.record_usage(entry)
+        
+        analyzer = HistoricalPatternAnalyzer(journal)
+        
+        # Act
+        peak_hours = await analyzer.get_peak_hours(top_n=3)
+        
+        # Assert
+        assert len(peak_hours) <= 3
+        assert 14 in peak_hours  # Hour 14 should be peak
+
+    @pytest.mark.asyncio
+    async def test_get_day_of_week_pattern_returns_7_days(self):
+        # Arrange
+        journal = UsageJournal()
+        analyzer = HistoricalPatternAnalyzer(journal)
+        
+        # Act
+        pattern = await analyzer.get_day_of_week_pattern()
+        
+        # Assert
+        assert len(pattern) == 7
+        for day in range(7):
+            assert day in pattern
+
+    @pytest.mark.asyncio
+    async def test_get_usage_patterns_returns_complete_analysis(self):
+        # Arrange
+        journal = UsageJournal()
+        analyzer = HistoricalPatternAnalyzer(journal)
+        
+        # Act
+        patterns = await analyzer.get_usage_patterns()
+        
+        # Assert
+        assert "hourly_distribution" in patterns
+        assert "peak_hours" in patterns
+        assert "day_of_week_pattern" in patterns
+        assert "is_currently_peak" in patterns
+
+
+class TestTimeAwareQuotaPredictor:
+    """Tests for Issue #6: Time-of-day awareness in quota prediction."""
+
+    @pytest.mark.asyncio
+    async def test_time_aware_predictor_has_pattern_analyzer(self):
+        # Arrange
+        predictor = TimeAwareQuotaPredictor()
+        
+        # Assert
+        assert hasattr(predictor, "pattern_analyzer")
+        assert isinstance(predictor.pattern_analyzer, HistoricalPatternAnalyzer)
+
+    @pytest.mark.asyncio
+    async def test_peak_hour_reserve_boost_increases_reserve(self):
+        # Arrange
+        limits = TierLimits(requests_per_day=1500)
+        predictor = TimeAwareQuotaPredictor(
+            tier_limits=limits,
+            human_reserve_percent=30,
+            peak_hour_reserve_boost=20
+        )
+        
+        # Assert
+        assert predictor.peak_hour_reserve_boost == 20
+        assert predictor.human_reserve_percent == 30
+
+    @pytest.mark.asyncio
+    async def test_get_predicted_usage_returns_hour_stats(self):
+        # Arrange
+        journal = UsageJournal()
+        predictor = TimeAwareQuotaPredictor(usage_journal=journal)
+        
+        # Act
+        predicted = await predictor.get_predicted_usage()
+        
+        # Assert
+        assert "predicted_requests" in predicted
+        assert "predicted_tokens" in predicted
+        assert "current_hour" in predicted
+        assert 0 <= predicted["current_hour"] <= 23
+
