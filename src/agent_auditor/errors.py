@@ -14,18 +14,18 @@ class AgentAuditorError(Exception):
 class QuotaExhaustedError(AgentAuditorError):
     """
     Raised when API quota is exhausted.
-    
+
     Includes reset_time for user display.
     """
-    
+
     def __init__(
-        self, 
+        self,
         message: str = "API quota exhausted",
         reset_time: Optional[datetime] = None
     ) -> None:
         super().__init__(message)
         self.reset_time = reset_time
-    
+
     def __str__(self) -> str:
         if self.reset_time:
             return f"Quota exhausted. Resets at {self.reset_time.isoformat()}"
@@ -34,9 +34,9 @@ class QuotaExhaustedError(AgentAuditorError):
 
 class RateLimitError(AgentAuditorError):
     """Raised when rate limit (RPM/TPM) is exceeded."""
-    
+
     def __init__(
-        self, 
+        self,
         message: str = "Rate limit exceeded",
         retry_after_seconds: int = 60
     ) -> None:
@@ -46,9 +46,9 @@ class RateLimitError(AgentAuditorError):
 
 class TaskExecutionError(AgentAuditorError):
     """Raised when a task fails to execute."""
-    
+
     def __init__(
-        self, 
+        self,
         message: str,
         task_id: Optional[str] = None,
         retryable: bool = True

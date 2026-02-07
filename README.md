@@ -31,7 +31,7 @@ from agent_auditor import ArbiterScheduler, AITask, RequestPriority
 
 async def main():
     scheduler = ArbiterScheduler()
-    
+
     # Human requests execute immediately
     task = AITask(
         name="user_query",
@@ -40,7 +40,7 @@ async def main():
     )
     result = await scheduler.submit(task)
     print(result.response)
-    
+
     # Check quota status
     status = scheduler.get_status()
     print(f"Requests remaining: {status['requests_remaining']}")

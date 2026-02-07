@@ -13,11 +13,11 @@ def step_impl(context):
     """
     from agent_auditor import ArbiterScheduler
     from agent_auditor.persistence.sqlite import SQLiteStorage
-    
+
     # Initialize storage using the scenario-specific DB path
     storage = SQLiteStorage(db_path=context.db_path)
     context.loop.run_until_complete(storage.initialize())
-    
+
     context.scheduler = ArbiterScheduler(storage=storage)
 
 @given('a valid API key is present')

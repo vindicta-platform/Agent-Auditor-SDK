@@ -8,12 +8,12 @@ Usage journal export to CSV/JSON for billing and analysis. Supports date range f
 
 ## Technical Context
 
-**Language/Version**: Python 3.11  
-**Primary Dependencies**: Pydantic, csv  
-**Storage**: SQLite  
-**Testing**: pytest  
-**Target Platform**: Agent-Auditor-SDK  
-**Project Type**: Backend library  
+**Language/Version**: Python 3.11
+**Primary Dependencies**: Pydantic, csv
+**Storage**: SQLite
+**Testing**: pytest
+**Target Platform**: Agent-Auditor-SDK
+**Project Type**: Backend library
 
 ## Project Structure
 

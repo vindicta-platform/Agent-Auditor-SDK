@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-The Agent-Auditor-SDK requires a robust acceptance testing framework to ensure that complex features like Quota-Aware Scheduling and Human Priority Guarantees meet Product Owner requirements. 
+The Agent-Auditor-SDK requires a robust acceptance testing framework to ensure that complex features like Quota-Aware Scheduling and Human Priority Guarantees meet Product Owner requirements.
 
 Currently, acceptance tests are written in pure Python (`test_acceptance.py`), which are hard for non-technical stakeholders to read and verify. We need a "Black Box" testing layer that:
 1. Validates the "WHAT" (Business Behavior) separately from the "HOW" (Implementation).

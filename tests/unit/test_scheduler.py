@@ -36,10 +36,10 @@ class TestSchedulerSubmit:
     async def test_submit_human_priority_executes_immediately(self, scheduler):
         # Arrange
         task = AITask(name="test", prompt="hi", priority=RequestPriority.HUMAN)
-        
+
         # Act
         result = await scheduler.submit(task)
-        
+
         # Assert
         assert result.status == "success"
         assert result.response == "Not implemented"
@@ -49,10 +49,10 @@ class TestSchedulerSubmit:
     async def test_submit_background_priority_queues(self, scheduler):
         # Arrange
         task = AITask(name="bg", prompt="proc", priority=RequestPriority.BACKGROUND)
-        
+
         # Act
         result = await scheduler.submit(task)
-        
+
         # Assert
         assert result.status == "queued"
         assert scheduler.queue.size == 1
@@ -61,10 +61,10 @@ class TestSchedulerSubmit:
     async def test_submit_returns_task_result(self, scheduler):
         # Arrange
         task = AITask(name="test", prompt="test", priority=RequestPriority.HUMAN)
-        
+
         # Act
         result = await scheduler.submit(task)
-        
+
         # Assert
         assert isinstance(result, TaskResult)
         assert result.task_id == task.id
@@ -75,7 +75,7 @@ class TestSchedulerSubmit:
         from agent_auditor.errors import QuotaExhaustedError
         scheduler._total_requests_today = 50 # Max limit
         task = AITask(name="test", prompt="hi", priority=RequestPriority.HUMAN)
-        
+
         # Act & Assert
         with pytest.raises(QuotaExhaustedError):
             await scheduler.submit(task)
@@ -87,10 +87,10 @@ class TestSchedulerRouting:
     async def test_route_human_to_immediate(self, scheduler):
         # Arrange
         task = AITask(name="human", prompt="p", priority=RequestPriority.HUMAN)
-        
+
         # Act
         route = scheduler._route_task(task)
-        
+
         # Assert
         assert route == "immediate"
 
@@ -98,10 +98,10 @@ class TestSchedulerRouting:
     async def test_route_critical_to_immediate(self, scheduler):
         # Arrange
         task = AITask(name="critical", prompt="p", priority=RequestPriority.CRITICAL)
-        
+
         # Act
         route = scheduler._route_task(task)
-        
+
         # Assert
         assert route == "immediate"
 
@@ -109,10 +109,10 @@ class TestSchedulerRouting:
     async def test_route_background_to_queue(self, scheduler, mock_storage):
         # Arrange
         task = AITask(name="bg", prompt="p", priority=RequestPriority.BACKGROUND)
-        
+
         # Act
         route = scheduler._route_task(task)
-        
+
         # Assert
         assert route == "queue"
 
@@ -124,11 +124,11 @@ class TestSchedulerPreemption:
         # Arrange
         scheduler._background_processing = True
         task = AITask(name="urgent", prompt="help", priority=RequestPriority.HUMAN)
-        
+
         # Act
         # Logic is inside submit -> _execute_immediate -> _pause_background
         result = await scheduler.submit(task)
-        
+
         # Assert
         assert result.status == "success"
         # Can't easily assert _background_paused state as it reverts primarily.
@@ -141,14 +141,14 @@ class TestSchedulerPreemption:
         for i in range(50):
             bg_task = AITask(name=f"bg_{i}", prompt="p", priority=RequestPriority.BACKGROUND)
             await scheduler.submit(bg_task)
-        
+
         human_task = AITask(name="human", prompt="help", priority=RequestPriority.HUMAN)
-        
+
         # Act
         start = time.perf_counter()
         result = await scheduler.submit(human_task)
         elapsed = time.perf_counter() - start
-        
+
         # Assert
         assert result.status == "success"
         assert elapsed < 0.2  # Should be fast regardless of queue size
@@ -162,10 +162,10 @@ class TestSchedulerDashboard:
         for i in range(3):
             task = AITask(name=f"bg_{i}", prompt="p", priority=RequestPriority.BACKGROUND)
             await scheduler.submit(task)
-        
+
         # Act
         status = scheduler.get_status()
-        
+
         # Assert
         assert "queue_size" in status
         assert status["queue_size"] == 3
@@ -178,9 +178,9 @@ class TestSchedulerUsage:
     async def test_records_usage_after_execution(self, scheduler):
         # Arrange
         task = AITask(name="test", prompt="p", priority=RequestPriority.HUMAN)
-        
+
         # Act
         await scheduler.submit(task)
-        
+
         # Assert
         assert scheduler._total_requests_today >= 1

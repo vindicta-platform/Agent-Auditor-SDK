@@ -1,8 +1,8 @@
 # Feature Specification: Task Queue Persistence
 
-**Feature Branch**: `027-task-queue`  
-**Created**: 2026-02-06  
-**Status**: Draft  
+**Feature Branch**: `027-task-queue`
+**Created**: 2026-02-06
+**Status**: Draft
 **Target**: Week 3 | **Repository**: Agent-Auditor-SDK
 
 ## User Scenarios & Testing

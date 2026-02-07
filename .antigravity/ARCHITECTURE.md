@@ -31,19 +31,19 @@ Platform-wide authority for AI quota tracking, predictive budgeting, and task or
 ```mermaid
 graph TD
     A[Client Service] --> B[Agent-Auditor-SDK]
-    
+
     B --> C[Quota Manager]
     B --> D[Task Scheduler]
     B --> E[Usage Tracker]
-    
+
     C --> F[Budget Forecaster]
     D --> G[Priority Queue]
     E --> H[Persistence Layer]
-    
+
     C --> I{Quota Check}
     I -->|OK| J[Gemini Adapter]
     I -->|Exceeded| K[Queue/Reject]
-    
+
     J --> L[Gemini API]
 ```
 

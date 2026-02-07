@@ -1,8 +1,8 @@
 # Feature Specification: Usage Journal Export
 
-**Feature Branch**: `029-usage-journal`  
-**Created**: 2026-02-06  
-**Status**: Draft  
+**Feature Branch**: `029-usage-journal`
+**Created**: 2026-02-06
+**Status**: Draft
 **Target**: Week 4 | **Repository**: Agent-Auditor-SDK
 
 ## User Scenarios & Testing

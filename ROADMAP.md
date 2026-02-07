@@ -1,14 +1,14 @@
 # Agent-Auditor-SDK Roadmap
 
-> **Vision**: Quota-aware AI scheduling that never blocks humans  
-> **Status**: Active Development  
+> **Vision**: Quota-aware AI scheduling that never blocks humans
+> **Status**: Active Development
 > **Last Updated**: 2026-02-05
 
 ---
 
 ## 📅 6-Week Schedule (Feb 4 - Mar 17, 2026)
 
-> **GitHub Project**: https://github.com/orgs/vindicta-platform/projects/4  
+> **GitHub Project**: https://github.com/orgs/vindicta-platform/projects/4
 > **Master Roadmap**: https://github.com/vindicta-platform/.github/blob/master/ROADMAP.md
 
 ### Week 1: Feb 4-10 — Priority Queue

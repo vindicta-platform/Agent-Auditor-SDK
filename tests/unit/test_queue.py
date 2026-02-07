@@ -24,10 +24,10 @@ class TestTaskQueueEnqueue:
         # Arrange
         queue = TaskQueue()
         task = AITask(name="test", prompt="prompt")
-        
+
         # Act
         await queue.enqueue(task)
-        
+
         # Assert
         assert queue.size == 1
 
@@ -35,12 +35,12 @@ class TestTaskQueueEnqueue:
     async def test_enqueue_multiple_tasks(self):
         # Arrange
         queue = TaskQueue()
-        
+
         # Act
         for i in range(5):
             task = AITask(name=f"task_{i}", prompt="prompt")
             await queue.enqueue(task)
-        
+
         # Assert
         assert queue.size == 5
 
@@ -52,7 +52,7 @@ class TestTaskQueueEnqueue:
         task1 = AITask(id=task_id, name="first", prompt="prompt")
         task2 = AITask(id=task_id, name="second", prompt="prompt")
         await queue.enqueue(task1)
-        
+
         # Act & Assert
         with pytest.raises(DuplicateTaskError):
             await queue.enqueue(task2)
@@ -70,10 +70,10 @@ class TestTaskQueueDequeue:
         await queue.enqueue(low)
         await queue.enqueue(high)
         await queue.enqueue(normal)
-        
+
         # Act
         first = await queue.dequeue()
-        
+
         # Assert
         assert first.name == "high"
         assert first.priority == RequestPriority.CRITICAL
@@ -86,10 +86,10 @@ class TestTaskQueueDequeue:
         await queue.enqueue(critical)
         human = AITask(name="human", prompt="p", priority=RequestPriority.HUMAN)
         await queue.enqueue(human)
-        
+
         # Act
         first = await queue.dequeue()
-        
+
         # Assert
         assert first.priority == RequestPriority.HUMAN
 
@@ -102,12 +102,12 @@ class TestTaskQueueDequeue:
             task = AITask(name=f"task_{i}", prompt="p", priority=RequestPriority.NORMAL)
             await queue.enqueue(task)
             await asyncio.sleep(0.001)  # Ensure ordering timestamp diff? (Implementation dependent)
-        
+
         # Act
         t1 = await queue.dequeue()
         t2 = await queue.dequeue()
         t3 = await queue.dequeue()
-        
+
         # Assert
         assert t1.name == "task_0"
         assert t2.name == "task_1"
@@ -117,10 +117,10 @@ class TestTaskQueueDequeue:
     async def test_dequeue_empty_returns_none(self):
         # Arrange
         queue = TaskQueue()
-        
+
         # Act
         result = await queue.dequeue()
-        
+
         # Assert
         assert result is None
 
@@ -131,10 +131,10 @@ class TestTaskQueueDequeue:
         task = AITask(name="test", prompt="p")
         await queue.enqueue(task)
         assert queue.size == 1
-        
+
         # Act
         await queue.dequeue()
-        
+
         # Assert
         assert queue.size == 0
 
@@ -149,10 +149,10 @@ class TestTaskQueuePeek:
         critical = AITask(name="critical", prompt="p", priority=RequestPriority.CRITICAL)
         await queue.enqueue(normal)
         await queue.enqueue(critical)
-        
+
         # Act
         peeked = await queue.peek()
-        
+
         # Assert
         assert peeked.name == "critical"
         assert queue.size == 2
@@ -161,10 +161,10 @@ class TestTaskQueuePeek:
     async def test_peek_empty_returns_none(self):
         # Arrange
         queue = TaskQueue()
-        
+
         # Act
         result = await queue.peek()
-        
+
         # Assert
         assert result is None
 
@@ -174,12 +174,12 @@ class TestTaskQueuePeek:
         queue = TaskQueue()
         task = AITask(name="stable", prompt="p")
         await queue.enqueue(task)
-        
+
         # Act
         peek1 = await queue.peek()
         peek2 = await queue.peek()
         peek3 = await queue.peek()
-        
+
         # Assert
         assert peek1.id == peek2.id == peek3.id
 
@@ -193,15 +193,15 @@ class TestTaskQueuePersistence:
         await storage.initialize()
         queue = TaskQueue(storage=storage)
         task = AITask(name="persistent", prompt="test")
-        
+
         # Act
         await queue.enqueue(task)
-        
+
         # Assert
         loaded = await storage.load_task(task.id)
         assert loaded is not None
         assert loaded.name == "persistent"
-        
+
         await storage.close()
 
     @pytest.mark.asyncio
@@ -214,20 +214,20 @@ class TestTaskQueuePersistence:
         task = AITask(name="survivor", prompt="test")
         await queue1.enqueue(task)
         await storage1.close()
-        
+
         # Session 2 (Restart)
         storage2 = SQLiteStorage(temp_db_path)
         await storage2.initialize()
         queue2 = TaskQueue(storage=storage2)
-        
+
         # Act
         await queue2.load_from_storage()
-        
+
         # Assert
         assert queue2.size == 1
         recovered = await queue2.peek()
         assert recovered.name == "survivor"
-        
+
         await storage2.close()
 
 
@@ -239,10 +239,10 @@ class TestDeadLetterQueue:
         dlq = DeadLetterQueue()
         task = AITask(name="failed", prompt="p")
         error = "API Error: 500 Internal Server Error"
-        
+
         # Act
         await dlq.add(task, error=error, attempts=3)
-        
+
         # Assert
         assert dlq.size == 1
 
@@ -251,11 +251,11 @@ class TestDeadLetterQueue:
         # Arrange
         dlq = DeadLetterQueue()
         task = AITask(name="failed", prompt="p")
-        
+
         # Act
         await dlq.add(task, error="Error 1", attempts=3)
         entry = await dlq.get(task.id)
-        
+
         # Assert
         assert entry.attempts == 3
         assert entry.last_error == "Error 1"
@@ -267,10 +267,10 @@ class TestDeadLetterQueue:
         for i in range(3):
             task = AITask(name=f"failed_{i}", prompt="p")
             await dlq.add(task, error=f"Error {i}", attempts=i+1)
-        
+
         # Act
         all_failed = await dlq.list_all()
-        
+
         # Assert
         assert len(all_failed) == 3
 
@@ -281,10 +281,10 @@ class TestDeadLetterQueue:
         task = AITask(name="retry_me", prompt="p")
         await dlq.add(task, error="Error", attempts=1)
         assert dlq.size == 1
-        
+
         # Act
         removed = await dlq.remove(task.id)
-        
+
         # Assert
         assert removed is not None
         assert dlq.size == 0

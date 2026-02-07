@@ -17,7 +17,7 @@ def before_all(context):
     """Global setup."""
     # Ensure strict separation of environments
     context.config.setup_logging()
-    
+
 def before_feature(context, feature):
     """Feature-level setup."""
     pass
@@ -31,15 +31,15 @@ def before_scenario(context, scenario):
     # 1. Async Loop Management
     context.loop = asyncio.new_event_loop()
     asyncio.set_event_loop(context.loop)
-    
+
     # 2. Database Isolation (Strategy: Unique Temp File per Scenario)
     # We don't create the file, just the path. The SDK code should create the DB.
     context.temp_dir = tempfile.mkdtemp()
     context.db_path = os.path.join(context.temp_dir, f"test_{scenario.name.replace(' ', '_')}.db")
-    
+
     # Inject into environment for SDK to find (if using env vars)
     os.environ["AGENT_AUDITOR_DB_PATH"] = context.db_path
-    
+
     # 3. Live vs Mock Mode
     if "live" in scenario.effective_tags:
         if not os.environ.get("GEMINI_API_KEY"):
@@ -58,11 +58,11 @@ def after_scenario(context, scenario):
     if hasattr(context, "loop"):
         context.loop.close()
         asyncio.set_event_loop(None)
-    
+
     # 2. Cleanup Filesystem
     if hasattr(context, "temp_dir"):
         shutil.rmtree(context.temp_dir, ignore_errors=True)
-        
+
     # 3. Cleanup Env
     if "AGENT_AUDITOR_DB_PATH" in os.environ:
         del os.environ["AGENT_AUDITOR_DB_PATH"]

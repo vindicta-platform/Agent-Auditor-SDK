@@ -8,12 +8,12 @@ Token bucket rate limiter for AI API calls. Configurable rate and burst with req
 
 ## Technical Context
 
-**Language/Version**: Python 3.11  
-**Primary Dependencies**: asyncio  
-**Storage**: In-memory  
-**Testing**: pytest  
-**Target Platform**: Agent-Auditor-SDK  
-**Project Type**: Backend library  
+**Language/Version**: Python 3.11
+**Primary Dependencies**: asyncio
+**Storage**: In-memory
+**Testing**: pytest
+**Target Platform**: Agent-Auditor-SDK
+**Project Type**: Backend library
 
 ## Project Structure
 

@@ -29,10 +29,10 @@ class TestUsageJournalRecordUsage:
             success=True,
             latency_ms=150
         )
-        
+
         # Act
         await journal.record_usage(entry)
-        
+
         # Assert
         history = await journal.get_history(hours=1)
         assert len(history) == 1
@@ -54,10 +54,10 @@ class TestUsageJournalRecordUsage:
                 latency_ms=100
             )
             await journal.record_usage(entry)
-        
+
         # Act
         totals = await journal.get_totals()
-        
+
         # Assert
         assert totals["total_tokens"] == 500
         assert totals["total_requests"] == 5
@@ -92,10 +92,10 @@ class TestUsageJournalGetHistory:
         )
         await journal.record_usage(recent)
         await journal.record_usage(old)
-        
+
         # Act
         history = await journal.get_history(hours=1)
-        
+
         # Assert
         assert len(history) == 1
         assert history[0].task_id == "recent"
@@ -117,10 +117,10 @@ class TestUsageJournalGetHistory:
                 latency_ms=100
             )
             await journal.record_usage(entry)
-        
+
         # Act
         breakdown = await journal.get_hourly_breakdown(hours=1)
-        
+
         # Assert
         assert breakdown["tokens"] == 500
         assert breakdown["requests"] == 5
@@ -141,10 +141,10 @@ class TestUsageJournalGetHistory:
                 latency_ms=100
             )
             await journal.record_usage(entry)
-        
+
         # Act
         daily = await journal.get_daily_usage()
-        
+
         # Assert
         assert daily["requests_today"] == 3
         assert daily["tokens_today"] == 3000
@@ -161,10 +161,10 @@ class TestQuotaPredictor:
             requests_per_day=1500
         )
         predictor = QuotaPredictor(tier_limits=limits, human_reserve_percent=30)
-        
+
         # Act
         budget = await predictor.get_safe_budget()
-        
+
         # Assert
         # 30% of 1500 = 450 reserved. Max available = 1050
         assert budget.requests_available <= 1050
@@ -175,7 +175,7 @@ class TestQuotaPredictor:
         # Arrange
         limits = TierLimits(requests_per_day=1500)
         journal = UsageJournal()
-        
+
         # Use 500 requests today
         for i in range(500):
             entry = UsageEntry(
@@ -189,16 +189,16 @@ class TestQuotaPredictor:
                 latency_ms=100
             )
             await journal.record_usage(entry)
-            
+
         predictor = QuotaPredictor(
             tier_limits=limits,
             usage_journal=journal,
             human_reserve_percent=20
         )
-        
+
         # Act
         budget = await predictor.get_safe_budget()
-        
+
         # Assert
         # 1500 daily - 500 used = 1000 remaining
         # 20% reserve = 200 for humans
@@ -223,15 +223,15 @@ class TestQuotaPredictor:
                 latency_ms=100
             )
             await journal.record_usage(entry)
-            
+
         predictor = QuotaPredictor(
             tier_limits=limits,
             usage_journal=journal
         )
-        
+
         # Act
         budget = await predictor.get_safe_budget()
-        
+
         # Assert
         assert budget.requests_available == 0
 
@@ -240,10 +240,10 @@ class TestQuotaPredictor:
         # Arrange
         limits = TierLimits()
         predictor = QuotaPredictor(tier_limits=limits)
-        
+
         # Act
         budget = await predictor.get_safe_budget()
-        
+
         # Assert
         assert 0.0 <= budget.confidence <= 1.0
 
@@ -256,10 +256,10 @@ class TestHistoricalPatternAnalyzer:
         # Arrange
         journal = UsageJournal()
         analyzer = HistoricalPatternAnalyzer(journal)
-        
+
         # Act
         distribution = await analyzer.get_hourly_distribution()
-        
+
         # Assert
         assert len(distribution) == 24
         for hour in range(24):
@@ -270,7 +270,7 @@ class TestHistoricalPatternAnalyzer:
         # Arrange
         journal = UsageJournal()
         now = datetime.utcnow()
-        
+
         # Add more usage at hour 14
         for i in range(10):
             entry = UsageEntry(
@@ -284,12 +284,12 @@ class TestHistoricalPatternAnalyzer:
                 latency_ms=100
             )
             await journal.record_usage(entry)
-        
+
         analyzer = HistoricalPatternAnalyzer(journal)
-        
+
         # Act
         peak_hours = await analyzer.get_peak_hours(top_n=3)
-        
+
         # Assert
         assert len(peak_hours) <= 3
         assert 14 in peak_hours  # Hour 14 should be peak
@@ -299,10 +299,10 @@ class TestHistoricalPatternAnalyzer:
         # Arrange
         journal = UsageJournal()
         analyzer = HistoricalPatternAnalyzer(journal)
-        
+
         # Act
         pattern = await analyzer.get_day_of_week_pattern()
-        
+
         # Assert
         assert len(pattern) == 7
         for day in range(7):
@@ -313,10 +313,10 @@ class TestHistoricalPatternAnalyzer:
         # Arrange
         journal = UsageJournal()
         analyzer = HistoricalPatternAnalyzer(journal)
-        
+
         # Act
         patterns = await analyzer.get_usage_patterns()
-        
+
         # Assert
         assert "hourly_distribution" in patterns
         assert "peak_hours" in patterns
@@ -331,7 +331,7 @@ class TestTimeAwareQuotaPredictor:
     async def test_time_aware_predictor_has_pattern_analyzer(self):
         # Arrange
         predictor = TimeAwareQuotaPredictor()
-        
+
         # Assert
         assert hasattr(predictor, "pattern_analyzer")
         assert isinstance(predictor.pattern_analyzer, HistoricalPatternAnalyzer)
@@ -345,7 +345,7 @@ class TestTimeAwareQuotaPredictor:
             human_reserve_percent=30,
             peak_hour_reserve_boost=20
         )
-        
+
         # Assert
         assert predictor.peak_hour_reserve_boost == 20
         assert predictor.human_reserve_percent == 30
@@ -355,13 +355,12 @@ class TestTimeAwareQuotaPredictor:
         # Arrange
         journal = UsageJournal()
         predictor = TimeAwareQuotaPredictor(usage_journal=journal)
-        
+
         # Act
         predicted = await predictor.get_predicted_usage()
-        
+
         # Assert
         assert "predicted_requests" in predicted
         assert "predicted_tokens" in predicted
         assert "current_hour" in predicted
         assert 0 <= predicted["current_hour"] <= 23
-

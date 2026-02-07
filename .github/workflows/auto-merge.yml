@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "Enabling auto-merge for PR: $PR_URL"
           gh pr merge "$PR_URL" --auto --squash
-          
+
       - name: Add comment
         uses: actions/github-script@v7
         with:

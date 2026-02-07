@@ -26,10 +26,10 @@ class TestSQLiteStorage:
     async def test_creates_database_on_init(self, db_path):
         # Arrange
         storage = SQLiteStorage(db_path)
-        
+
         # Act
         await storage.initialize()
-        
+
         # Assert
         assert os.path.exists(db_path)
         await storage.close()
@@ -39,10 +39,10 @@ class TestSQLiteStorage:
         # Arrange
         storage = SQLiteStorage(db_path)
         await storage.initialize()
-        
+
         # Act
         tables = await storage.list_tables()
-        
+
         # Assert
         assert "tasks" in tables
         assert "usage" in tables
@@ -58,11 +58,11 @@ class TestSQLiteStorage:
             prompt="Test prompt",
             priority=RequestPriority.NORMAL
         )
-        
+
         # Act
         await storage.save_task(task)
         loaded = await storage.load_task(task.id)
-        
+
         # Assert
         assert loaded is not None
         assert loaded.name == "test_task"
@@ -74,10 +74,10 @@ class TestSQLiteStorage:
         # Arrange
         storage = SQLiteStorage(db_path)
         await storage.initialize()
-        
+
         # Act
         loaded = await storage.load_task(uuid4())
-        
+
         # Assert
         assert loaded is None
         await storage.close()
@@ -90,13 +90,13 @@ class TestSQLiteStorage:
         t1 = AITask(name="low", prompt="p", priority=RequestPriority.LOW)
         t2 = AITask(name="high", prompt="p", priority=RequestPriority.CRITICAL)
         t3 = AITask(name="normal", prompt="p", priority=RequestPriority.NORMAL)
-        
+
         # Act
         await storage.save_task(t1, status="pending")
         await storage.save_task(t2, status="pending")
         await storage.save_task(t3, status="pending")
         pending = await storage.list_pending_tasks()
-        
+
         # Assert
         # Should be ordered by priority (highest first)
         assert len(pending) == 3
@@ -112,11 +112,11 @@ class TestSQLiteStorage:
         await storage.initialize()
         task = AITask(name="test", prompt="p")
         await storage.save_task(task, status="pending")
-        
+
         # Act
         await storage.update_task_status(task.id, "completed")
         status = await storage.get_task_status(task.id)
-        
+
         # Assert
         assert status == "completed"
         await storage.close()
@@ -136,10 +136,10 @@ class TestSQLiteStorage:
             success=True,
             latency_ms=150
         )
-        
+
         # Act
         await storage.record_usage(entry)
-        
+
         # Assert
         history = await storage.get_usage_history(hours=1)
         assert len(history) == 1
@@ -165,10 +165,10 @@ class TestSQLiteStorage:
                 latency_ms=100
             )
             await storage.record_usage(entry)
-        
+
         # Act
         hourly = await storage.get_usage_by_hour(hours=1)
-        
+
         # Assert
         assert hourly["total_tokens"] == 500
         assert hourly["total_requests"] == 5
@@ -183,13 +183,13 @@ class TestSQLiteStorage:
         task = AITask(name="persistent", prompt="test")
         await storage1.save_task(task)
         await storage1.close()
-        
+
         # Act
         # Session 2
         storage2 = SQLiteStorage(db_path)
         await storage2.initialize()
         loaded = await storage2.load_task(task.id)
-        
+
         # Assert
         assert loaded is not None
         assert loaded.name == "persistent"
