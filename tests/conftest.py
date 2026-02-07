@@ -151,7 +151,7 @@ def sample_background_task_dict():
         "id": str(uuid4()),
         "name": "debate_simulation",
         "prompt": "Simulate a debate between T'au and Necrons",
-        "model": "gemini-1.5-flash", 
+        "model": "gemini-1.5-flash",
         "priority": 5,  # BACKGROUND
         "estimated_tokens": 500,
     }

@@ -43,7 +43,7 @@ def status_command(json_format: bool = False) -> None:
     """Show scheduler status."""
     scheduler = get_scheduler()
     status = scheduler.get_status()
-    
+
     if json_format:
         print(json.dumps(status, indent=2))
     else:
@@ -63,7 +63,7 @@ async def submit_command(
 ) -> dict:
     """Submit a task to the scheduler."""
     scheduler = get_scheduler()
-    
+
     # Parse priority
     priority_map = {
         "human": RequestPriority.HUMAN,
@@ -73,17 +73,17 @@ async def submit_command(
         "low": RequestPriority.LOW,
         "background": RequestPriority.BACKGROUND,
     }
-    
+
     priority_enum = priority_map.get(priority.lower(), RequestPriority.NORMAL)
-    
+
     task = AITask(
         name=name or "cli_task",
         prompt=prompt,
         priority=priority_enum
     )
-    
+
     result = await scheduler.submit(task)
-    
+
     return {
         "task_id": str(result.task_id),
         "status": result.status,
@@ -94,14 +94,14 @@ async def submit_command(
 async def process_command(max_tasks: int = 10) -> dict:
     """Process background tasks."""
     scheduler = get_scheduler()
-    
+
     worker = TaskWorker(
         queue=scheduler.queue,
         dead_letter_queue=DeadLetterQueue()
     )
-    
+
     processed = await worker.run_until_empty(max_tasks=max_tasks)
-    
+
     return {
         "processed": processed,
         "remaining": scheduler.queue.size,
@@ -114,15 +114,15 @@ def get_parser() -> argparse.ArgumentParser:
         prog="agent-auditor",
         description="Agent-Auditor-SDK: Quota-aware AI scheduling"
     )
-    
+
     parser.add_argument(
         "--version", "-v",
         action="version",
         version=f"%(prog)s {__version__}"
     )
-    
+
     subparsers = parser.add_subparsers(dest="command", help="Commands")
-    
+
     # status command
     status_parser = subparsers.add_parser("status", help="Show scheduler status")
     status_parser.add_argument(
@@ -130,7 +130,7 @@ def get_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Output as JSON"
     )
-    
+
     # submit command
     submit_parser = subparsers.add_parser("submit", help="Submit a task")
     submit_parser.add_argument("prompt", help="The prompt to submit")
@@ -144,7 +144,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--name", "-n",
         help="Task name"
     )
-    
+
     # process command
     process_parser = subparsers.add_parser("process", help="Process background tasks")
     process_parser.add_argument(
@@ -153,7 +153,7 @@ def get_parser() -> argparse.ArgumentParser:
         default=10,
         help="Maximum tasks to process"
     )
-    
+
     return parser
 
 
@@ -161,15 +161,15 @@ def cli(args: Optional[list] = None) -> int:
     """Main CLI entry point."""
     parser = get_parser()
     parsed = parser.parse_args(args)
-    
+
     if parsed.command is None:
         parser.print_help()
         return 0
-    
+
     if parsed.command == "status":
         status_command(json_format=parsed.json)
         return 0
-    
+
     elif parsed.command == "submit":
         result = asyncio.run(submit_command(
             prompt=parsed.prompt,
@@ -178,12 +178,12 @@ def cli(args: Optional[list] = None) -> int:
         ))
         print(json.dumps(result, indent=2))
         return 0
-    
+
     elif parsed.command == "process":
         result = asyncio.run(process_command(max_tasks=parsed.max))
         print(json.dumps(result, indent=2))
         return 0
-    
+
     return 1
 
 

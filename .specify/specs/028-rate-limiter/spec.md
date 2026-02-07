@@ -1,8 +1,8 @@
 # Feature Specification: Rate Limiter Token Bucket
 
-**Feature Branch**: `028-rate-limiter`  
-**Created**: 2026-02-06  
-**Status**: Draft  
+**Feature Branch**: `028-rate-limiter`
+**Created**: 2026-02-06
+**Status**: Draft
 **Target**: Week 2 | **Repository**: Agent-Auditor-SDK
 
 ## User Scenarios & Testing

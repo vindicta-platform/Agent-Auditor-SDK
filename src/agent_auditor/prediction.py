@@ -33,17 +33,17 @@ class UsagePattern:
 
 class QuotaPredictor(ABC):
     """Abstract interface for quota prediction."""
-    
+
     @abstractmethod
     def predict(self, horizon_hours: int = 24) -> QuotaPrediction:
         """Predict quota usage for the next N hours."""
         pass
-    
+
     @abstractmethod
     def get_safe_budget(self) -> int:
         """Calculate safe budget for current period."""
         pass
-    
+
     @abstractmethod
     def get_patterns(self) -> list[UsagePattern]:
         """Get historical usage patterns."""

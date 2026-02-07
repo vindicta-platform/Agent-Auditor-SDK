@@ -1,8 +1,8 @@
 # Task Breakdown: Quota-Aware AI Scheduling
 
-**Spec**: `spec.md`  
-**Plan**: `plan.md`  
-**Created**: 2026-02-03  
+**Spec**: `spec.md`
+**Plan**: `plan.md`
+**Created**: 2026-02-03
 **Status**: Ready for Execution
 
 ---

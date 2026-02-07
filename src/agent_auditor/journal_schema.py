@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS quota_snapshots (
 CREATE TRIGGER IF NOT EXISTS cleanup_old_entries
 AFTER INSERT ON usage_journal
 BEGIN
-    DELETE FROM usage_journal 
+    DELETE FROM usage_journal
     WHERE timestamp < datetime('now', '-30 days');
 END;
 """

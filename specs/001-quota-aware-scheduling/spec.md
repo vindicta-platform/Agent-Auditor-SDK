@@ -161,7 +161,7 @@ As **Brandon Fox**, I want to see real-time quota status and background task act
 ### Gemini Tier ✅
 **Answer**: Free Tier (corrected)
 - 15 RPM (requests per minute)
-- 1M TPM (tokens per minute)  
+- 1M TPM (tokens per minute)
 - 1,500 RPD (requests per day)
 
 ### Background Task Priority Order ✅
@@ -215,4 +215,3 @@ As **Brandon Fox**, I want to see real-time quota status and background task act
 - **v0.1**: Python function `scheduler.get_status()` → dict
 - **v0.2**: CLI command `python -m agent_auditor status`
 - **v1.0**: HTTP endpoint via FastAPI for JSON status
-

@@ -1,7 +1,7 @@
 # Implementation Plan: Quota-Aware AI Scheduling
 
-**Spec**: `specs/001-quota-aware-scheduling/spec.md`  
-**Created**: 2026-02-03  
+**Spec**: `specs/001-quota-aware-scheduling/spec.md`
+**Created**: 2026-02-03
 **Status**: Ready for Implementation
 
 ---

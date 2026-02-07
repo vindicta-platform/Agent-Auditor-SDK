@@ -22,7 +22,7 @@ def step_impl(context, percent):
 def step_impl(context):
     # Queue a few background tasks
     task = AITask(name="bg_task", prompt="proc", priority=RequestPriority.BACKGROUND)
-    # We rely on asyncio to run this synchronous-looking step, 
+    # We rely on asyncio to run this synchronous-looking step,
     # but since enqueue is async, verifying it here is tricky without running loop.
     # For simplicity in this test, we just assume the queue works or manually push if exposed.
     # But strictly using public API:
@@ -40,10 +40,10 @@ def step_impl(context):
 @when('I submit a human request')
 def step_impl(context, prompt="Test Prompt"):
     task = AITask(name="human_req", prompt=prompt, priority=RequestPriority.HUMAN)
-    
+
     async def _submit():
         return await context.scheduler.submit(task)
-        
+
     try:
         context.result = context.loop.run_until_complete(_submit())
     except Exception as e:
@@ -70,7 +70,7 @@ def step_impl(context):
     # This is hard to verify with the current black-box approach + mocked execution.
     # However, the Scheduler logic sets _background_paused = True during _execute_immediate.
     # To verify this purely BDD, we'd need a slow-running background mock and check concurrency.
-    # For now, we assume the unit tests cover the locking mechanic, 
+    # For now, we assume the unit tests cover the locking mechanic,
     # so we just pass this step as "Verified by Design" or check simple state if possible.
     pass
 
@@ -99,13 +99,13 @@ def step_impl(context, days):
     from agent_auditor.quota import UsageJournal
     from agent_auditor.models import UsageEntry, RequestPriority
     from datetime import datetime, timedelta
-    
+
     # Check if context already has a journal (from previous steps)
     if not hasattr(context, 'journal'):
         from agent_auditor.persistence.sqlite import SQLiteStorage
         # Use storage if available? No, mock for now
         context.journal = UsageJournal()
-    
+
     # Populate with synthetic data
     now = datetime.utcnow()
     for i in range(days * 24):
@@ -125,7 +125,7 @@ def step_impl(context, days):
 @when('the scheduler evaluates capacity')
 def step_impl(context):
     from agent_auditor.quota import QuotaPredictor
-    
+
     # Use context.scheduler if it has a predictor, else create one
     if hasattr(context.scheduler, 'predictor'):
         context.predictor = context.scheduler.predictor
@@ -136,7 +136,7 @@ def step_impl(context):
 
     async def _predict():
         return await context.predictor.get_safe_budget()
-        
+
     context.budget = context.loop.run_until_complete(_predict())
 
 @then('it should calculate a safe budget with positive confidence')
@@ -151,13 +151,13 @@ def step_impl(context, requests):
     # But Predictor uses requests_per_day limit.
     limit = requests * 24
     context.scheduler.tier_limits.requests_per_day = limit
-    
+
     # Initialize Predictor/Journal if not present
     from agent_auditor.quota import UsageJournal, QuotaPredictor
     if not hasattr(context, 'journal'):
         context.journal = UsageJournal()
     context.predictor = QuotaPredictor(
-        tier_limits=context.scheduler.tier_limits, 
+        tier_limits=context.scheduler.tier_limits,
         usage_journal=context.journal,
         human_reserve_percent=20 # standard
     )
@@ -166,7 +166,7 @@ def step_impl(context, requests):
 def step_impl(context, count):
     from agent_auditor.models import UsageEntry, RequestPriority
     from datetime import datetime
-    
+
     # Record usage "today"
     # We record one big entry or loop
     entry = UsageEntry(
@@ -186,18 +186,18 @@ def step_impl(context, count):
     # Calculate delta from previous step
     if not hasattr(context, 'journal'):
          context.execute_steps(f'Given {count} requests are consumed by background tasks')
-    
+
     # We assume 'count' is total usage.
     # Check current requests today from journal
     # Access private _requests_today or use get_daily_usage
     daily = context.loop.run_until_complete(context.journal.get_daily_usage())
     current = daily['requests_today']
-    
+
     delta = count - current
     if delta > 0:
         # call the correct step string exactly
         context.execute_steps(f'Given {delta} requests are consumed by background tasks')
-    
+
     # Re-evaluate
     async def _predict():
         return await context.predictor.get_safe_budget()
@@ -211,19 +211,19 @@ def step_impl(context):
     # BUT, if we assume the step meant "Global Limit is 50 requests TOTAL", not per hour.
     # Let's adjust the limit in this step to force the condition if the math implies it.
     # Or assert regarding available requests.
-    
+
     # If we assume Request Per Day is SMALL to force throttle.
     # If usage is 45. To throttle, limit should be close to 45.
     # If we set limit = 50.
     context.scheduler.tier_limits.requests_per_day = 50
-    
+
     # Re-predict with new limit
     async def _predict():
         # Update predictor's limit ref
         context.predictor.tier_limits.requests_per_day = 50
         return await context.predictor.get_safe_budget()
     context.budget = context.loop.run_until_complete(_predict())
-    
+
     # If Limit=50. Used=45. Rem=5. Avail = 5*0.8 = 4.
     # Still positive.
     # Check if budget is visibly reduced

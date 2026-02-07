@@ -8,12 +8,12 @@ Durable task queue with disk persistence. Survives process restarts and handles 
 
 ## Technical Context
 
-**Language/Version**: Python 3.11  
-**Primary Dependencies**: SQLite, Pydantic  
-**Storage**: SQLite file  
-**Testing**: pytest  
-**Target Platform**: Agent-Auditor-SDK  
-**Project Type**: Backend library  
+**Language/Version**: Python 3.11
+**Primary Dependencies**: SQLite, Pydantic
+**Storage**: SQLite file
+**Testing**: pytest
+**Target Platform**: Agent-Auditor-SDK
+**Project Type**: Backend library
 
 ## Project Structure
 
